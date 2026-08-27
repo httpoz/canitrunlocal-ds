@@ -1,0 +1,11 @@
+[
+  {
+    "id": "nvidia-rtx-4070",
+    "name": "GeForce RTX 4070",
+    "manufacturer": "NVIDIA",
+    "vramGb": 12,
+    "memoryBandwidthGbps": 504.2,
+    "architecture": "Ada Lovelace",
+    "releaseDate": "2023-04-13"
+  }
+]

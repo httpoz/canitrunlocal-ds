@@ -1,0 +1,10 @@
+[
+  {
+    "id": "apple-m4-pro",
+    "name": "Apple M4 Pro",
+    "manufacturer": "Apple",
+    "cores": 14,
+    "memoryBandwidthGbps": 273,
+    "releaseDate": "2024-10-30"
+  }
+]

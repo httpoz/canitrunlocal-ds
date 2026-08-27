@@ -1,0 +1,11 @@
+[
+  {
+    "id": "amd-ryzen-9-7950x",
+    "name": "Ryzen 9 7950X",
+    "manufacturer": "AMD",
+    "cores": 16,
+    "threads": 32,
+    "memoryBandwidthGbps": 83.2,
+    "releaseDate": "2022-09-27"
+  }
+]
