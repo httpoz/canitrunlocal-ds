@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/httpoz/local-rig-specs/schema/gpu.schema.json",
+  "title": "GPU",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "manufacturer", "vramGb", "memoryBandwidthGbps"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Stable slug, <manufacturer-slug>-<model-slug>. Never renamed once assigned."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name. Correctable without breaking id-based lookups."
+    },
+    "manufacturer": {
+      "type": "string",
+      "enum": ["NVIDIA", "AMD", "Intel"],
+      "description": "Must match the vendor file this entry lives in (enforced by the validator, not this schema)."
+    },
+    "vramGb": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Dedicated VRAM in GB."
+    },
+    "memoryBandwidthGbps": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Rated memory bandwidth in GB/s."
+    },
+    "architecture": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Context only, e.g. 'Ada Lovelace'. Never used for matching/lookup logic."
+    },
+    "releaseDate": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}
