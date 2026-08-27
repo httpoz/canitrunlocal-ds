@@ -19,17 +19,27 @@ def load_schema(schema_path: Path) -> dict:
     return json.loads(schema_path.read_text())
 
 
+class InvalidVendorFileError(Exception):
+    """Raised when a vendor JSON file's top-level value isn't a list of entries."""
+
+
 def load_category_files(category_dir: Path) -> dict[str, list[dict]]:
     """Returns {filename: [entries...]} for every *.json file in category_dir."""
     files = {}
     for path in sorted(category_dir.glob("*.json")):
-        files[path.name] = json.loads(path.read_text())
+        parsed = json.loads(path.read_text())
+        if not isinstance(parsed, list):
+            raise InvalidVendorFileError(
+                f"{path.name}: expected a top-level JSON array of entries, "
+                f"got {type(parsed).__name__}"
+            )
+        files[path.name] = parsed
     return files
 
 
 def validate_schema(entries_by_file: dict[str, list[dict]], schema: dict) -> list[str]:
     """Returns human-readable error strings, empty if every entry is valid."""
-    validator = Draft202012Validator(schema)
+    validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
     errors = []
     for filename, entries in entries_by_file.items():
         for index, entry in enumerate(entries):
@@ -45,6 +55,8 @@ def check_vendor_consistency(entries_by_file: dict[str, list[dict]]) -> list[str
         vendor_slug = filename.removesuffix(".json")
         for index, entry in enumerate(entries):
             manufacturer = entry.get("manufacturer", "")
+            if not isinstance(manufacturer, str):
+                continue
             if manufacturer.lower() != vendor_slug.lower():
                 errors.append(
                     f"{filename}[{index}]: manufacturer {manufacturer!r} does not match "
@@ -103,6 +115,9 @@ def main() -> int:
             entries_by_file = load_category_files(category_dir)
         except json.JSONDecodeError as e:
             print(f"FATAL: could not parse JSON in {category_name}/: {e}", file=sys.stderr)
+            return 1
+        except InvalidVendorFileError as e:
+            print(f"FATAL: invalid vendor file in {category_name}/: {e}", file=sys.stderr)
             return 1
 
         all_errors.extend(validate_schema(entries_by_file, schema))

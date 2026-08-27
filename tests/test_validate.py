@@ -96,6 +96,47 @@ def test_check_duplicates_flags_duplicate_manufacturer_name_pair():
     assert any("GeForce RTX 4070" in e for e in errors)
 
 
+def test_validate_schema_rejects_invalid_release_date():
+    entries_by_file = {
+        "nvidia.json": [
+            {
+                "id": "nvidia-rtx-4070",
+                "name": "GeForce RTX 4070",
+                "manufacturer": "NVIDIA",
+                "vramGb": 12,
+                "memoryBandwidthGbps": 504.2,
+                "releaseDate": "not-a-date",
+            }
+        ]
+    }
+    errors = validate.validate_schema(entries_by_file, GPU_SCHEMA)
+    assert len(errors) == 1
+    assert "nvidia.json[0]" in errors[0]
+
+
+def test_check_vendor_consistency_skips_non_string_manufacturer():
+    entries_by_file = {
+        "nvidia.json": [
+            {"id": "nvidia-rtx-4070", "name": "GeForce RTX 4070", "manufacturer": 5}
+        ]
+    }
+    errors = validate.check_vendor_consistency(entries_by_file)
+    assert errors == []
+
+
+def test_load_category_files_rejects_non_list_top_level_json(tmp_path):
+    category_dir = tmp_path / "gpus"
+    category_dir.mkdir()
+    (category_dir / "nvidia.json").write_text(
+        json.dumps({"id": "nvidia-rtx-4070", "name": "GeForce RTX 4070", "manufacturer": "NVIDIA"})
+    )
+    try:
+        validate.load_category_files(category_dir)
+        assert False, "expected InvalidVendorFileError"
+    except validate.InvalidVendorFileError as e:
+        assert "nvidia.json" in str(e)
+
+
 def test_check_duplicates_allows_similar_but_distinct_names():
     all_entries = [
         ("gpus/nvidia.json", {"id": "nvidia-rtx-4070", "manufacturer": "NVIDIA", "name": "GeForce RTX 4070"}),
