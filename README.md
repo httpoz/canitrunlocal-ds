@@ -1,0 +1,54 @@
+# local-rig-specs
+
+A structured, validated dataset of GPU and CPU hardware specs — memory
+size/bandwidth, core counts — for projects that need to look up known
+hardware rather than trust free-text user input.
+
+**Status:** schema and validation pipeline only. No real hardware data
+has been populated yet beyond a few illustrative examples proving the
+pipeline works — see [Contributing](#contributing) if you want to help
+change that.
+
+## Schema
+
+Each record lives in `gpus/<vendor>.json` or `cpus/<vendor>.json` as a
+JSON array, validated against `schema/gpu.schema.json` or
+`schema/cpu.schema.json` respectively — those schema files are the
+source of truth for field names, types, and constraints; this README
+doesn't duplicate them.
+
+A few notes that aren't obvious from the schema alone:
+
+- `id` is a stable slug (`<manufacturer-slug>-<model-slug>`) that, once
+  assigned, is never renamed — `name` can be corrected freely, `id`
+  cannot, since consumers may key off it.
+- Every entry's `manufacturer` must match the vendor file it lives in
+  (`gpus/nvidia.json` entries must all be `"manufacturer": "NVIDIA"`).
+- Apple Silicon SoCs have no separate GPU entry — unified memory means
+  there's no distinct "VRAM" number, so `cpus/apple.json`'s
+  `memoryBandwidthGbps` is the one number that covers both CPU and GPU
+  memory bandwidth for that chip.
+
+## Contributing
+
+1. Add your entry to the right `gpus/<vendor>.json` or
+   `cpus/<vendor>.json` file.
+2. Run the validator locally before opening a PR:
+   ```sh
+   pip install -r requirements.txt
+   python3 scripts/validate.py
+   pytest tests/
+   ```
+3. Open a PR. CI runs the same checks.
+
+The validator checks schema conformance, that your entry's
+`manufacturer` matches its file, and that you haven't introduced a
+duplicate `id` or an exact duplicate `(manufacturer, name)` pair.
+
+## License
+
+Code, schemas, and scripts in this repo are MIT-licensed (see
+`LICENSE`). No third-party data has been incorporated yet; a future
+data-population effort sourcing from a share-alike-licensed dataset
+(e.g. Wikipedia, CC-BY-SA 4.0) will need to document that data's
+license separately when it lands, since MIT alone wouldn't cover it.
