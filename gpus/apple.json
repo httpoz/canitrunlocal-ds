@@ -1,0 +1,18 @@
+[
+  {
+    "id": "apple-m4-pro-24gb",
+    "name": "Apple M4 Pro 24GB",
+    "manufacturer": "Apple",
+    "vramGb": 24,
+    "memoryBandwidthGbps": 273,
+    "releaseDate": "2024-10-30"
+  },
+  {
+    "id": "apple-m4-pro-48gb",
+    "name": "Apple M4 Pro 48GB",
+    "manufacturer": "Apple",
+    "vramGb": 48,
+    "memoryBandwidthGbps": 273,
+    "releaseDate": "2024-10-30"
+  }
+]

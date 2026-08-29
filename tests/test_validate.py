@@ -81,7 +81,7 @@ def test_check_vendor_consistency_passes_matching_manufacturer():
 def test_check_duplicates_flags_duplicate_id():
     all_entries = [
         ("gpus/nvidia.json", {"id": "dup-id", "manufacturer": "NVIDIA", "name": "A"}),
-        ("cpus/amd.json", {"id": "dup-id", "manufacturer": "AMD", "name": "B"}),
+        ("gpus/amd.json", {"id": "dup-id", "manufacturer": "AMD", "name": "B"}),
     ]
     errors = validate.check_duplicates(all_entries)
     assert any("duplicate id 'dup-id'" in e for e in errors)
@@ -135,6 +135,33 @@ def test_load_category_files_rejects_non_list_top_level_json(tmp_path):
         assert False, "expected InvalidVendorFileError"
     except validate.InvalidVendorFileError as e:
         assert "nvidia.json" in str(e)
+
+
+def test_validate_schema_accepts_apple_unified_memory_entry():
+    entries_by_file = {
+        "apple.json": [
+            {
+                "id": "apple-m4-pro-24gb",
+                "name": "Apple M4 Pro 24GB",
+                "manufacturer": "Apple",
+                "vramGb": 24,
+                "memoryBandwidthGbps": 273,
+                "releaseDate": "2024-10-30",
+            }
+        ]
+    }
+    errors = validate.validate_schema(entries_by_file, GPU_SCHEMA)
+    assert errors == []
+
+
+def test_check_vendor_consistency_passes_apple_under_gpus():
+    entries_by_file = {
+        "apple.json": [
+            {"id": "apple-m4-pro-24gb", "name": "Apple M4 Pro 24GB", "manufacturer": "Apple"}
+        ]
+    }
+    errors = validate.check_vendor_consistency(entries_by_file)
+    assert errors == []
 
 
 def test_check_duplicates_allows_similar_but_distinct_names():

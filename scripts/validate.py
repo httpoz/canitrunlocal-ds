@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validates local-rig-specs GPU/CPU JSON records: schema conformance,
+"""Validates local-rig-specs GPU JSON records: schema conformance,
 vendor-file consistency, and duplicate ids/names."""
 import json
 import sys
@@ -11,7 +11,6 @@ from jsonschema import Draft202012Validator
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CATEGORIES = {
     "gpus": REPO_ROOT / "schema" / "gpu.schema.json",
-    "cpus": REPO_ROOT / "schema" / "cpu.schema.json",
 }
 
 
@@ -67,9 +66,8 @@ def check_vendor_consistency(entries_by_file: dict[str, list[dict]]) -> list[str
 
 def check_duplicates(all_entries: list[tuple[str, dict]]) -> list[str]:
     """all_entries is a list of (filename, entry) pairs across every category/file.
-    Returns error strings for duplicate ids (checked globally, across both
-    categories) and duplicate (manufacturer, name) pairs (checked globally too
-    — GPUs and CPUs don't realistically collide with each other on name)."""
+    Returns error strings for duplicate ids and duplicate (manufacturer, name)
+    pairs, both checked globally across all vendor files."""
     con = duckdb.connect(":memory:")
     con.execute(
         "CREATE TABLE entries (filename VARCHAR, id VARCHAR, manufacturer VARCHAR, name VARCHAR)"
@@ -138,7 +136,7 @@ def main() -> int:
             print(f"  - {error}", file=sys.stderr)
         return 1
 
-    print(f"OK — {counts.get('gpus', 0)} GPUs, {counts.get('cpus', 0)} CPUs validated")
+    print(f"OK — {counts.get('gpus', 0)} GPUs validated")
     return 0
 
 

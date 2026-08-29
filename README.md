@@ -1,7 +1,7 @@
 # local-rig-specs
 
-A structured, validated dataset of GPU and CPU hardware specs — memory
-size/bandwidth, core counts — for projects that need to look up known
+A structured, validated dataset of GPU hardware specs — memory
+size/bandwidth, architecture — for projects that need to look up known
 hardware rather than trust free-text user input.
 
 **Status:** schema and validation pipeline only. No real hardware data
@@ -11,11 +11,10 @@ change that.
 
 ## Schema
 
-Each record lives in `gpus/<vendor>.json` or `cpus/<vendor>.json` as a
-JSON array, validated against `schema/gpu.schema.json` or
-`schema/cpu.schema.json` respectively — those schema files are the
-source of truth for field names, types, and constraints; this README
-doesn't duplicate them.
+Each record lives in `gpus/<vendor>.json` as a JSON array, validated
+against `schema/gpu.schema.json` — that schema file is the source of
+truth for field names, types, and constraints; this README doesn't
+duplicate it.
 
 A few notes that aren't obvious from the schema alone:
 
@@ -24,15 +23,19 @@ A few notes that aren't obvious from the schema alone:
   cannot, since consumers may key off it.
 - Every entry's `manufacturer` must match the vendor file it lives in
   (`gpus/nvidia.json` entries must all be `"manufacturer": "NVIDIA"`).
-- Apple Silicon SoCs have no separate GPU entry — unified memory means
-  there's no distinct "VRAM" number, so `cpus/apple.json`'s
-  `memoryBandwidthGbps` is the one number that covers both CPU and GPU
-  memory bandwidth for that chip.
+- Apple Silicon SoCs are modeled as GPUs, one entry per chip *and*
+  unified-memory configuration it actually ships in (e.g. an M4 Pro
+  ships in 24GB and 48GB configs, so it gets two `gpus/apple.json`
+  entries — `apple-m4-pro-24gb` and `apple-m4-pro-48gb`) — unified
+  memory is the same kind of fact as a GPU's VRAM (a named compute
+  unit with a fixed amount of fast memory), it's just shared with the
+  CPU instead of dedicated. `vramGb` is that configuration's unified
+  memory size, and `memoryBandwidthGbps` covers both CPU and GPU
+  traffic since they share the one pool.
 
 ## Contributing
 
-1. Add your entry to the right `gpus/<vendor>.json` or
-   `cpus/<vendor>.json` file.
+1. Add your entry to the right `gpus/<vendor>.json` file.
 2. Run the validator locally before opening a PR:
    ```sh
    pip install -r requirements.txt

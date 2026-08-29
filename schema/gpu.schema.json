@@ -18,13 +18,13 @@
     },
     "manufacturer": {
       "type": "string",
-      "enum": ["NVIDIA", "AMD", "Intel"],
+      "enum": ["NVIDIA", "AMD", "Intel", "Apple"],
       "description": "Must match the vendor file this entry lives in (enforced by the validator, not this schema)."
     },
     "vramGb": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "description": "Dedicated VRAM in GB."
+      "description": "VRAM in GB. For an Apple Silicon SoC, this is the unified-memory capacity for that configuration (shared by CPU and GPU), not dedicated VRAM."
     },
     "memoryBandwidthGbps": {
       "type": "number",
