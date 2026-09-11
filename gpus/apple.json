@@ -14,5 +14,45 @@
     "vramGb": 48,
     "memoryBandwidthGbps": 273,
     "releaseDate": "2024-10-30"
+  },
+  {
+    "id": "apple-m4-pro-64gb",
+    "name": "Apple M4 Pro 64GB",
+    "manufacturer": "Apple",
+    "vramGb": 64,
+    "memoryBandwidthGbps": 273,
+    "releaseDate": "2024-10-30"
+  },
+  {
+    "id": "apple-m4-max-36gb",
+    "name": "Apple M4 Max 36GB",
+    "manufacturer": "Apple",
+    "vramGb": 36,
+    "memoryBandwidthGbps": 410,
+    "releaseDate": "2024-10-30"
+  },
+  {
+    "id": "apple-m4-max-48gb",
+    "name": "Apple M4 Max 48GB",
+    "manufacturer": "Apple",
+    "vramGb": 48,
+    "memoryBandwidthGbps": 546,
+    "releaseDate": "2024-10-30"
+  },
+  {
+    "id": "apple-m4-max-64gb",
+    "name": "Apple M4 Max 64GB",
+    "manufacturer": "Apple",
+    "vramGb": 64,
+    "memoryBandwidthGbps": 546,
+    "releaseDate": "2024-10-30"
+  },
+  {
+    "id": "apple-m4-max-128gb",
+    "name": "Apple M4 Max 128GB",
+    "manufacturer": "Apple",
+    "vramGb": 128,
+    "memoryBandwidthGbps": 546,
+    "releaseDate": "2024-10-30"
   }
 ]
