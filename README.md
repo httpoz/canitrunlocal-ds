@@ -1,8 +1,18 @@
-# local-rig-specs
+# canitrunlocal-ds
 
 A structured, validated dataset of GPU hardware specs — memory
 size/bandwidth, architecture — for projects that need to look up known
 hardware rather than trust free-text user input.
+
+This is the data source behind [CanItRunLocal](https://canitrunlocal.com)'s
+hardware catalog: its `sync-hardware-specs` job pulls `gpus/*.json` from
+this repo's `main` branch on a schedule and upserts the entries into
+`GpuSpec`, which is what lets CanItRunLocal match a user's GPU or Apple
+chip to a known VRAM/bandwidth spec instead of trusting free-text input.
+Adding or correcting an entry here (see [Contributing](#contributing))
+is the way to fix or expand what CanItRunLocal — or any other consumer —
+knows about a piece of hardware; it is not tied to CanItRunLocal's own
+codebase or release process.
 
 **Status:** schema and validation pipeline only. No real hardware data
 has been populated yet beyond a few illustrative examples proving the
