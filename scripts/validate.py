@@ -12,6 +12,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CATEGORIES = {
     "gpus": REPO_ROOT / "schema" / "gpu.schema.json",
 }
+RUNTIMES_FILE = REPO_ROOT / "runtimes.json"
+RUNTIME_SCHEMA_PATH = REPO_ROOT / "schema" / "runtime.schema.json"
 
 
 def load_schema(schema_path: Path) -> dict:
@@ -100,6 +102,42 @@ def check_duplicates(all_entries: list[tuple[str, dict]]) -> list[str]:
     return errors
 
 
+def load_flat_file(path: Path) -> list[dict]:
+    """Like load_category_files, but for a single flat JSON-array file
+    (runtimes.json has no per-vendor split the way gpus/ does)."""
+    parsed = json.loads(path.read_text())
+    if not isinstance(parsed, list):
+        raise InvalidVendorFileError(
+            f"{path.name}: expected a top-level JSON array of entries, "
+            f"got {type(parsed).__name__}"
+        )
+    return parsed
+
+
+def validate_flat_schema(entries: list[dict], schema: dict, filename: str) -> list[str]:
+    validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
+    errors = []
+    for index, entry in enumerate(entries):
+        for error in validator.iter_errors(entry):
+            errors.append(f"{filename}[{index}]: {error.message}")
+    return errors
+
+
+def check_runtime_duplicates(entries: list[dict]) -> list[str]:
+    """Runtimes have no vendor-file split to key duplicates by, so this
+    checks id and name uniqueness directly across the one flat list."""
+    errors = []
+    for key in ("id", "name"):
+        seen: dict[str, int] = {}
+        for entry in entries:
+            value = entry.get(key)
+            seen[value] = seen.get(value, 0) + 1
+        for value, n in seen.items():
+            if n > 1:
+                errors.append(f"duplicate runtime {key} {value!r} appears {n} times")
+    return errors
+
+
 def main() -> int:
     all_errors: list[str] = []
     all_entries: list[tuple[str, dict]] = []
@@ -130,13 +168,26 @@ def main() -> int:
 
     all_errors.extend(check_duplicates(all_entries))
 
+    try:
+        runtime_entries = load_flat_file(RUNTIMES_FILE)
+    except json.JSONDecodeError as e:
+        print(f"FATAL: could not parse JSON in {RUNTIMES_FILE.name}: {e}", file=sys.stderr)
+        return 1
+    except InvalidVendorFileError as e:
+        print(f"FATAL: {e}", file=sys.stderr)
+        return 1
+
+    runtime_schema = load_schema(RUNTIME_SCHEMA_PATH)
+    all_errors.extend(validate_flat_schema(runtime_entries, runtime_schema, RUNTIMES_FILE.name))
+    all_errors.extend(check_runtime_duplicates(runtime_entries))
+
     if all_errors:
         print(f"FAILED — {len(all_errors)} issue(s) found:\n", file=sys.stderr)
         for error in all_errors:
             print(f"  - {error}", file=sys.stderr)
         return 1
 
-    print(f"OK — {counts.get('gpus', 0)} GPUs validated")
+    print(f"OK — {counts.get('gpus', 0)} GPUs, {len(runtime_entries)} runtimes validated")
     return 0
 
 

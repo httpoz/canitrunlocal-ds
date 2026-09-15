@@ -1,0 +1,32 @@
+[
+  {
+    "id": "llama-cpp",
+    "name": "llama.cpp",
+    "version": "b3800",
+    "github": "https://github.com/ggml-org/llama.cpp"
+  },
+  {
+    "id": "ollama",
+    "name": "Ollama",
+    "version": "0.3.12",
+    "github": "https://github.com/ollama/ollama"
+  },
+  {
+    "id": "lm-studio",
+    "name": "LM Studio",
+    "version": "0.3.2",
+    "github": "https://github.com/lmstudio-ai"
+  },
+  {
+    "id": "vllm",
+    "name": "vLLM",
+    "version": "0.6.0",
+    "github": "https://github.com/vllm-project/vllm"
+  },
+  {
+    "id": "mlx",
+    "name": "MLX",
+    "version": "0.17.0",
+    "github": "https://github.com/ml-explore/mlx"
+  }
+]

@@ -171,3 +171,43 @@ def test_check_duplicates_allows_similar_but_distinct_names():
     ]
     errors = validate.check_duplicates(all_entries)
     assert errors == []
+
+
+RUNTIME_SCHEMA = json.loads((REPO_ROOT / "schema" / "runtime.schema.json").read_text())
+
+
+def test_validate_flat_schema_accepts_valid_runtime():
+    entries = [{"id": "ollama", "name": "Ollama", "version": "0.3.12", "github": "https://github.com/ollama/ollama"}]
+    errors = validate.validate_flat_schema(entries, RUNTIME_SCHEMA, "runtimes.json")
+    assert errors == []
+
+
+def test_validate_flat_schema_rejects_missing_required_field():
+    entries = [{"id": "ollama", "name": "Ollama", "version": "0.3.12"}]
+    errors = validate.validate_flat_schema(entries, RUNTIME_SCHEMA, "runtimes.json")
+    assert len(errors) == 1
+    assert "runtimes.json[0]" in errors[0]
+
+
+def test_validate_flat_schema_rejects_non_uri_github():
+    entries = [{"id": "ollama", "name": "Ollama", "version": "0.3.12", "github": "not-a-url"}]
+    errors = validate.validate_flat_schema(entries, RUNTIME_SCHEMA, "runtimes.json")
+    assert len(errors) == 1
+
+
+def test_check_runtime_duplicates_flags_duplicate_id():
+    entries = [
+        {"id": "ollama", "name": "Ollama", "version": "0.3.12", "github": "https://github.com/ollama/ollama"},
+        {"id": "ollama", "name": "Ollama Turbo", "version": "0.4.0", "github": "https://github.com/ollama/ollama"},
+    ]
+    errors = validate.check_runtime_duplicates(entries)
+    assert any("duplicate runtime id 'ollama'" in e for e in errors)
+
+
+def test_check_runtime_duplicates_passes_distinct_entries():
+    entries = [
+        {"id": "ollama", "name": "Ollama", "version": "0.3.12", "github": "https://github.com/ollama/ollama"},
+        {"id": "vllm", "name": "vLLM", "version": "0.6.0", "github": "https://github.com/vllm-project/vllm"},
+    ]
+    errors = validate.check_runtime_duplicates(entries)
+    assert errors == []
