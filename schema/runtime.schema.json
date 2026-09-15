@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/httpoz/canitrunlocal-ds/schema/runtime.schema.json",
+  "title": "Runtime",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "version", "github"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Stable slug, never renamed once assigned -- same convention as a GPU's id."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name. canitrunlocal upserts its Runtime rows by this exact string, so renaming it here creates a new row there rather than updating the existing one."
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The version canitrunlocal reports as currently tracked. Bump on a release worth noting, not on every patch."
+    },
+    "github": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "description": "Canonical source repo -- linked from canitrunlocal's UI wherever this runtime is shown."
+    }
+  }
+}
